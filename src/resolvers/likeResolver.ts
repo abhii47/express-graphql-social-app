@@ -5,10 +5,7 @@ import { authenticate } from "../helpers/auth";
 import { notFoundError } from "../helpers/errors";
 
 const likeResolvers = {
-  Query: {
-    // likes: async (_: any, { post_id }: any) =>
-    //   await Like.findAll({ where: { post_id }, include: [User, Post] }),
-  },
+  Query: {},
   Mutation: {
     likePost: async (_: any, { post_id }: any, { token }: any) => {
       const decoded = authenticate({ token });
