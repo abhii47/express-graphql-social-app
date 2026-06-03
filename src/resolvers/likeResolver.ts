@@ -2,7 +2,8 @@ import Like from "../models/like";
 import User from "../models/user";
 import Post from "../models/post";
 import { authenticate } from "../helpers/auth";
-import { notFoundError } from "../helpers/errors";
+import { ConflictError, internalServerError, notFoundError } from "../helpers/errors";
+import pubsub from "../config/pubsub";
 
 const likeResolvers = {
   Query: {},
@@ -14,16 +15,17 @@ const likeResolvers = {
       if (!post) throw notFoundError("Post not found");
 
       // prevent duplicate likes
-      const existing = await Like.findOne({
-        where: { post_id, user_id: decoded.user_id },
-      });
-      if (existing) return existing;
-
-      const like = await Like.create({
-        post_id,
-        user_id: decoded.user_id,
-      });
-      return like;
+      try {
+        const like = await Like.create({
+          post_id,
+          user_id: decoded.user_id,
+        });
+        // pubsub.publish("LIKE_ADDED", { likeAdded: like });
+        return like;
+      } catch (err:any) {
+          if(err.name === "SequelizeUniqueConstraintError") throw ConflictError("You have already liked this post");
+          throw internalServerError(err.message);
+      }
     },
   },
   Like: {
