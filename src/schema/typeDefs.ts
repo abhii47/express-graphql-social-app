@@ -10,6 +10,8 @@ const typeDefs = `
     title: String!
     content: String!
     creator: User!
+    likesCount: Int!
+    commentsCount: Int!
     comments: [Comment!]!
     likes: [Like!]!
   }
@@ -33,7 +35,7 @@ const typeDefs = `
   }
 
   type Query {
-    posts: [Post!]!
+    posts(limit: Int, offset: Int, creator_id: ID, keyword: String): [Post!]!
     post(post_id: ID!): Post
   }
 
