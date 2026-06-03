@@ -38,6 +38,12 @@ Like.init(
   {
     sequelize,
     modelName: "Like",
+    indexes:[
+      {
+        unique: true,
+        fields: [ "post_id", "user_id" ]
+      }
+    ]
   }
 );
 

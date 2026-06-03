@@ -2,6 +2,7 @@ import { Op } from "sequelize";
 import { authenticate } from "../helpers/auth";
 import { accessForbiddenError, notFoundError } from "../helpers/errors";
 import { User, Post, Comment, Like } from "../models";
+import pubsub from "../config/pubsub";
 
 const postResolvers = {
   Query: {
@@ -29,6 +30,7 @@ const postResolvers = {
         content,
         creator_id: decoded.user_id,
       });
+      pubsub.publish("POST_ADDED", { postAdded: post });  
       return post;
     },
     updatePost: async (_: any, { post_id, title, content }: any, { token }: any) => {

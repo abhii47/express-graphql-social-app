@@ -27,3 +27,6 @@ export const validationError = (message: string) =>
 
 export const internalServerError = (message: string) =>
   graphQLError(message, "INTERNAL_SERVER_ERROR", 500);
+
+export const ConflictError = (message: string) =>
+  graphQLError(message, "CONFLICT", 409);

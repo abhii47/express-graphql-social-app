@@ -3,6 +3,7 @@ import User from "../models/user";
 import Post from "../models/post";
 import { authenticate } from "../helpers/auth";
 import { accessForbiddenError, notFoundError, unauthorizedError } from "../helpers/errors";
+import pubsub from "../config/pubsub";
 
 const commentResolvers = {
   Query: {},
@@ -18,6 +19,7 @@ const commentResolvers = {
         post_id,
         user_id: decoded.user_id,
       });
+      // pubsub.publish("COMMENT_ADDED", { commentAdded: comment });
       return comment;
     },
     updateComment: async (_: any, { comment_id, message }: any, { token }: any) => {

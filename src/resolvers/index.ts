@@ -1,6 +1,7 @@
 import commentResolvers from "./commentResolver";
 import likeResolvers from "./likeResolver";
 import postResolvers from "./postresolver";
+import subscriptionResolver from "./subscriptionResolver";
 import userResolvers from "./userResolver";
 
 const resolvers = {
@@ -24,6 +25,9 @@ const resolvers = {
     },
     Like:{
         ...likeResolvers.Like
+    },
+    Subscription:{
+        ...subscriptionResolver.Subscription
     }
 };
 

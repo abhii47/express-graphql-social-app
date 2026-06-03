@@ -50,6 +50,12 @@ const typeDefs = `
     deleteComment(comment_id: ID!): Boolean!
     likePost(post_id: ID!): Like!
   }
+  
+  type Subscription {
+    postAdded: Post!
+    #commentAdded(post_id: ID): Comment!
+    #likeAdded(post_id: ID): Like! 
+  }
 `;
 
 export default typeDefs;
