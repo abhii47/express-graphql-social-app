@@ -4,18 +4,7 @@ import { authenticate, signAuthToken } from "../helpers/auth";
 import { notFoundError, unauthorizedError, validationError } from "../helpers/errors";
 
 const userResolvers = {
-  Query: {
-    // hello: () => "Hello world!",
-    // me: async (_: any, __: any, { token }: any) => {
-    //   if (!token) return null;
-    //   try {
-    //     const decoded = authenticate({ token });
-    //     return await User.findByPk(decoded.user_id);
-    //   } catch {
-    //     return null;
-    //   }
-    // },
-  },
+  Query: {},
   Mutation: {
     register: async (_: any, { name, email, password }: any) => {
       const existingUser = await User.findOne({ where: { email } });

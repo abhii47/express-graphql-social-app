@@ -5,10 +5,7 @@ import { authenticate } from "../helpers/auth";
 import { accessForbiddenError, notFoundError, unauthorizedError } from "../helpers/errors";
 
 const commentResolvers = {
-  Query: {
-    // comments: async (_: any, { post_id }: any) =>
-    //   await Comment.findAll({ where: { post_id }, include: [User, Post] }),
-  },
+  Query: {},
   Mutation: {
     addComment: async (_: any, { post_id, message }: any, { token }: any) => {
       const decoded = authenticate({ token });
