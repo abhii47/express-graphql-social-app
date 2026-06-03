@@ -1,14 +1,25 @@
-import Post from "../models/post";
-import User from "../models/user";
+import { Op } from "sequelize";
 import { authenticate } from "../helpers/auth";
-import { accessForbiddenError, notFoundError, unauthorizedError } from "../helpers/errors";
-import { Comment, Like } from "../models";
+import { accessForbiddenError, notFoundError } from "../helpers/errors";
+import { User, Post, Comment, Like } from "../models";
 
 const postResolvers = {
   Query: {
-    posts: async () => await Post.findAll({ include: [User] }),
-    post: async (_: any, { post_id }: any) =>
-      await Post.findByPk(post_id, { include: [User] }),
+    posts: async (_:any, { limit = 10, offset = 0, creator_id, keyword }:any) => {
+      const where:any = {};
+      if(creator_id) where.creator_id = creator_id;
+      if(keyword) where.title = { [Op.like]: `%${keyword}%` };
+
+      const posts = await Post.findAll({
+        where,
+        limit,
+        offset,
+        order:[["createdAt","DESC"]],
+      });
+
+      return posts;
+    },
+    post: async (_: any, { post_id }: any) => await Post.findByPk(post_id),
   },
   Mutation: {
     createPost: async (_: any, { title, content }: any, { token }: any) => {
@@ -49,6 +60,10 @@ const postResolvers = {
       await Comment.findAll({where:{ post_id:post.post_id }}),
     likes: async(post:any) => 
       await Like.findAll({where:{ post_id:post.post_id }}),
+    commentsCount: async(post:any) => 
+      await Comment.count({ where:{ post_id:post.post_id }}),
+    likesCount: async(post:any) =>
+      await Like.count({ where:{ post_id:post.post_id }})
   },
 };
 
