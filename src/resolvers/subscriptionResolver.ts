@@ -6,12 +6,12 @@ const subscriptionResolver = {
         postAdded: {
             subscribe: () => pubsub.asyncIterableIterator("POST_ADDED"),
         },
-        // commentAdded: {
-        //     subscribe: (_:any, { post_id }:any ) => pubsub.asyncIterableIterator("COMMENT_ADDED"),
-        // },
-        // likeAdded: {
-        //     subscribe: (_:any, { post_id }:any ) => pubsub.asyncIterableIterator("LIKE_ADDED"),
-        // },
+        commentAdded: {
+            subscribe: (_:any, __:any, context:any) => pubsub.asyncIterableIterator(`COMMENT_ADDED_USER_${context.user_id}`),
+        },
+        likeAdded: {
+            subscribe: (_:any, __:any, context:any) => pubsub.asyncIterableIterator(`LIKE_ADDED_USER_${context.user_id}`),
+        },
     },
 };
 
