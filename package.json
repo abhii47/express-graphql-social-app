@@ -14,13 +14,19 @@
   "dependencies": {
     "@apollo/server": "^4.13.0",
     "@as-integrations/express4": "^1.1.2",
+    "@graphql-tools/schema": "^10.0.33",
+    "@types/ws": "^8.18.1",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^4.22.2",
     "graphql": "^16.14.1",
+    "graphql-subscriptions": "^3.0.0",
+    "graphql-ws": "^5.16.2",
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.22.4",
-    "sequelize": "^6.37.8"
+    "sequelize": "^6.37.8",
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

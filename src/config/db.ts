@@ -1,7 +1,8 @@
 import { Sequelize } from "sequelize";
+import { getEnv } from "./env";
 
-const sequelize = new Sequelize("insta_clone_db", "root", "mysql@abhi", {
-  host: "localhost",
+const sequelize = new Sequelize(getEnv("DB_NAME"), getEnv("DB_USER"), getEnv("DB_PASSWORD"), {
+  host: getEnv("DB_HOST", "localhost"),
   dialect: "mysql",
   logging: false,
 });

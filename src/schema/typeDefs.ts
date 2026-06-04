@@ -10,6 +10,23 @@ const typeDefs = `
     title: String!
     content: String!
     creator: User!
+    likesCount: Int!
+    commentsCount: Int!
+    comments: [Comment!]!
+    likes: [Like!]!
+  }
+  
+  type Comment {
+    comment_id: ID!
+    message: String!
+    user: User!
+    post: Post!
+  }
+
+  type Like {
+    like_id: ID!
+    user: User!
+    post: Post!
   }
 
   type AuthPayload {
@@ -18,9 +35,7 @@ const typeDefs = `
   }
 
   type Query {
-    hello: String
-    me: User
-    posts: [Post!]!
+    posts(limit: Int, offset: Int, creator_id: ID, keyword: String): [Post!]!
     post(post_id: ID!): Post
   }
 
@@ -28,6 +43,18 @@ const typeDefs = `
     register(name: String!, email: String!, password: String!): User!
     login(email: String!, password: String!): AuthPayload!
     createPost(title: String!, content: String!): Post!
+    updatePost(post_id: ID!, title: String, content: String): Post!
+    deletePost(post_id: ID!): Boolean!
+    addComment(post_id: ID!, message: String!): Comment!
+    updateComment(comment_id: ID!, message: String!): Comment!
+    deleteComment(comment_id: ID!): Boolean!
+    likePost(post_id: ID!): Like!
+  }
+  
+  type Subscription {
+    postAdded: Post!
+    commentAdded: Comment!
+    likeAdded: Like! 
   }
 `;
 
