@@ -57,15 +57,20 @@ const postResolvers = {
     },
   },
   Post: {
-    creator: async (post: any) => await User.findByPk(post.creator_id),
-    comments: async (post:any) => 
-      await Comment.findAll({where:{ post_id:post.post_id }}),
-    likes: async(post:any) => 
-      await Like.findAll({where:{ post_id:post.post_id }}),
-    commentsCount: async(post:any) => 
-      await Comment.count({ where:{ post_id:post.post_id }}),
-    likesCount: async(post:any) =>
-      await Like.count({ where:{ post_id:post.post_id }})
+    creator: async (post: any, _: any, { loaders }: any) => 
+        await loaders.userLoader.load(post.creator_id),
+
+    comments: async (post: any, _: any, { loaders }: any) => 
+        await loaders.commentsLoader.load(post.post_id),
+
+    likes: async (post: any, _: any, { loaders }: any) => 
+        await loaders.likesLoader.load(post.post_id),
+
+    commentsCount: async (post: any, _: any, { loaders }: any) => 
+        await loaders.commentsCountLoader.load(post.post_id),
+
+    likesCount: async (post: any, _: any, { loaders }: any) => 
+        await loaders.likesCountLoader.load(post.post_id),
   },
 };
 
