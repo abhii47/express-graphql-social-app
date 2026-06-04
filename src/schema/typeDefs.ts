@@ -53,8 +53,8 @@ const typeDefs = `
   
   type Subscription {
     postAdded: Post!
-    #commentAdded(post_id: ID): Comment!
-    #likeAdded(post_id: ID): Like! 
+    commentAdded: Comment!
+    likeAdded: Like! 
   }
 `;
 

@@ -19,7 +19,7 @@ const commentResolvers = {
         post_id,
         user_id: decoded.user_id,
       });
-      // pubsub.publish("COMMENT_ADDED", { commentAdded: comment });
+      pubsub.publish(`COMMENT_ADDED_USER_${post.creator_id}`, { commentAdded: comment });
       return comment;
     },
     updateComment: async (_: any, { comment_id, message }: any, { token }: any) => {

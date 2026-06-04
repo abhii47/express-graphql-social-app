@@ -20,7 +20,7 @@ const likeResolvers = {
           post_id,
           user_id: decoded.user_id,
         });
-        // pubsub.publish("LIKE_ADDED", { likeAdded: like });
+        pubsub.publish(`LIKE_ADDED_USER_${post.creator_id}`, { likeAdded: like });
         return like;
       } catch (err:any) {
           if(err.name === "SequelizeUniqueConstraintError") throw ConflictError("You have already liked this post");

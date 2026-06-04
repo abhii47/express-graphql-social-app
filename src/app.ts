@@ -11,6 +11,8 @@ import "./models";
 import { WebSocketServer } from 'ws';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { useServer } from "graphql-ws/lib/use/ws";
+import { authenticate } from "./helpers/auth";
+import { unauthorizedError } from "./helpers/errors";
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -24,8 +26,23 @@ const wsServer = new WebSocketServer({
 useServer({ 
     schema,
     onConnect: (ctx) => {
-        console.log("Client connected");
-        return true;
+        const token = ctx.connectionParams?.authorization as string;
+        console.log("token",token);
+        if (!token) {
+            throw unauthorizedError("Unauthorized: Token required");
+        }
+        try {
+            const decoded = authenticate({ token });
+            console.log("Client connected:", decoded.user_id);
+            return { user_id: decoded.user_id };
+        } catch (err) {
+            throw unauthorizedError("Unauthorized: Invalid token");
+        }
+    },
+    context: (ctx) => {
+        const token = ctx.connectionParams?.authorization as string;
+        const decoded = authenticate({ token });
+        return { user_id: decoded.user_id };
     },
     onDisconnect: () => {
         console.log("Client disconnected");
