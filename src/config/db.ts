@@ -4,7 +4,7 @@ import { getEnv } from "./env";
 const sequelize = new Sequelize(getEnv("DB_NAME"), getEnv("DB_USER"), getEnv("DB_PASSWORD"), {
   host: getEnv("DB_HOST", "localhost"),
   dialect: "mysql",
-  logging: false,
+  logging: console.log,
 });
 
 export const connectDB = async () => {

@@ -45,7 +45,8 @@ const commentResolvers = {
     },
   },
   Comment: {
-    user: async (comment: any) => await User.findByPk(comment.user_id),
+    user: async (comment: any, _: any, { loaders }: any) => 
+        await loaders.userLoader.load(comment.user_id),
     post: async (comment: any) => await Post.findByPk(comment.post_id),
   },
 };

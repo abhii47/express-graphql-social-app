@@ -29,7 +29,8 @@ const likeResolvers = {
     },
   },
   Like: {
-    user: async (like: any) => await User.findByPk(like.user_id),
+   user: async (like: any, _: any, { loaders }: any) => 
+        await loaders.userLoader.load(like.user_id),
     post: async (like: any) => await Post.findByPk(like.post_id),
   },
 };

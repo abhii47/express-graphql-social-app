@@ -13,6 +13,13 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 import { useServer } from "graphql-ws/lib/use/ws";
 import { authenticate } from "./helpers/auth";
 import { unauthorizedError } from "./helpers/errors";
+import { 
+    createUserLoader, 
+    createCommentsLoader, 
+    createLikesLoader,
+    createCommentsCountLoader,
+    createLikesCountLoader
+} from "./config/dataLoader"
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -64,7 +71,14 @@ const startServer = async() => {
             express.json(),
             expressMiddleware(server, {
                 context: async ({ req }) => ({
-                    token: req.headers.authorization
+                    token: req.headers.authorization,
+                    loaders: {
+                        userLoader: createUserLoader(),
+                        commentsLoader: createCommentsLoader(),
+                        likesLoader: createLikesLoader(),
+                        commentsCountLoader: createCommentsCountLoader(),
+                        likesCountLoader: createLikesCountLoader(),
+                    }
                 }),
             })
         );
