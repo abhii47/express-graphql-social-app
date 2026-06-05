@@ -3,6 +3,7 @@ import { authenticate } from "../helpers/auth";
 import { accessForbiddenError, notFoundError } from "../helpers/errors";
 import { User, Post, Comment, Like } from "../models";
 import pubsub from "../config/pubsub";
+import { createPostSchema, updatePostSchema, validate } from "../helpers/validation";
 
 const postResolvers = {
   Query: {
@@ -23,8 +24,9 @@ const postResolvers = {
     post: async (_: any, { post_id }: any) => await Post.findByPk(post_id),
   },
   Mutation: {
-    createPost: async (_: any, { title, content }: any, { token }: any) => {
+    createPost: async (_: any, args: any, { token }: any) => {
       const decoded = authenticate({ token });
+      const { title,content } = validate(createPostSchema, args);
       const post = await Post.create({
         title,
         content,
@@ -33,8 +35,9 @@ const postResolvers = {
       pubsub.publish("POST_ADDED", { postAdded: post });  
       return post;
     },
-    updatePost: async (_: any, { post_id, title, content }: any, { token }: any) => {
+    updatePost: async (_: any, args: any, { token }: any) => {
       const decoded = authenticate({ token });
+      const { post_id, title, content } = validate(updatePostSchema, args);
 
       const post = await Post.findByPk(post_id);
       if (!post) throw notFoundError("Post not found");

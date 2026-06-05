@@ -1,15 +1,16 @@
 import Comment from "../models/comment";
-import User from "../models/user";
 import Post from "../models/post";
 import { authenticate } from "../helpers/auth";
 import { accessForbiddenError, notFoundError, unauthorizedError } from "../helpers/errors";
 import pubsub from "../config/pubsub";
+import { addCommentSchema, updateCommentSchema, validate } from "../helpers/validation";
 
 const commentResolvers = {
   Query: {},
   Mutation: {
-    addComment: async (_: any, { post_id, message }: any, { token }: any) => {
+    addComment: async (_: any, args: any, { token }: any) => {
       const decoded = authenticate({ token });
+      const { post_id, message } = validate(addCommentSchema, args);
 
       const post = await Post.findByPk(post_id);
       if (!post) throw notFoundError("Post not found");
@@ -22,8 +23,9 @@ const commentResolvers = {
       pubsub.publish(`COMMENT_ADDED_USER_${post.creator_id}`, { commentAdded: comment });
       return comment;
     },
-    updateComment: async (_: any, { comment_id, message }: any, { token }: any) => {
+    updateComment: async (_: any, args: any, { token }: any) => {
       const decoded = authenticate({token});
+      const {comment_id, message} = validate(updateCommentSchema, args);
 
       const comment = await Comment.findByPk(comment_id);
       if (!comment) throw notFoundError("Comment not found");
