@@ -20,6 +20,7 @@ import {
     createCommentsCountLoader,
     createLikesCountLoader
 } from "./config/dataLoader"
+// import { Notify } from "./helpers/notify";
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -30,9 +31,10 @@ const wsServer = new WebSocketServer({
     server: httpServer,
     path: "/graphql",
 });
+export const connectedUsers = new Set<number>();
 useServer({ 
     schema,
-    onConnect: (ctx) => {
+    onConnect: async(ctx) => {
         const token = ctx.connectionParams?.authorization as string;
         console.log("token",token);
         if (!token) {
@@ -40,7 +42,13 @@ useServer({
         }
         try {
             const decoded = authenticate({ token });
+            (ctx.extra as any).user = decoded;
+            connectedUsers.add(decoded.user_id);
+            // console.log(`inside set =>>`, connectedUsers);
             console.log("Client connected:", decoded.user_id);
+            // const notification = await Notify(decoded.user_id);
+            // const messages = notification.map(n => n.message);
+            // console.log("messages",messages);
             return { user_id: decoded.user_id };
         } catch (err) {
             throw unauthorizedError("Unauthorized: Invalid token");
@@ -49,10 +57,22 @@ useServer({
     context: (ctx) => {
         const token = ctx.connectionParams?.authorization as string;
         const decoded = authenticate({ token });
-        return { user_id: decoded.user_id };
+        return { 
+            user_id: decoded.user_id,
+            loaders: {
+                userLoader: createUserLoader(),
+                commentsLoader: createCommentsLoader(),
+                likesLoader: createLikesLoader(),
+                commentsCountLoader: createCommentsCountLoader(),
+                likesCountLoader: createLikesCountLoader(),
+            }
+        };
     },
-    onDisconnect: () => {
-        console.log("Client disconnected");
+    onDisconnect: (ctx) => {
+        const user = (ctx.extra as any).user;
+        connectedUsers.delete(user.user_id);
+        // console.log(`inside set =>>`, connectedUsers);
+        console.log("Client disconnected", user.user_id);
     }
 }, wsServer);
 
