@@ -4,12 +4,14 @@ import Post from "../models/post";
 import { authenticate } from "../helpers/auth";
 import { ConflictError, internalServerError, notFoundError } from "../helpers/errors";
 import pubsub from "../config/pubsub";
+import { likePostSchema, validate } from "../helpers/validation";
 
 const likeResolvers = {
   Query: {},
   Mutation: {
-    likePost: async (_: any, { post_id }: any, { token }: any) => {
+    likePost: async (_: any, args: any, { token }: any) => {
       const decoded = authenticate({ token });
+      const { post_id } = validate(likePostSchema, args);
 
       const post = await Post.findByPk(post_id);
       if (!post) throw notFoundError("Post not found");
