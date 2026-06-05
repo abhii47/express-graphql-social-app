@@ -5,6 +5,9 @@ import { authenticate } from "../helpers/auth";
 import { ConflictError, internalServerError, notFoundError } from "../helpers/errors";
 import pubsub from "../config/pubsub";
 import { likePostSchema, validate } from "../helpers/validation";
+import { connectedUsers } from "../app";
+import { Notification } from "../models";
+import { NotificationType } from "../models/notification";
 
 const likeResolvers = {
   Query: {},
@@ -22,7 +25,23 @@ const likeResolvers = {
           post_id,
           user_id: decoded.user_id,
         });
-        pubsub.publish(`LIKE_ADDED_USER_${post.creator_id}`, { likeAdded: like });
+        if(decoded.user_id !== post.creator_id ){
+          //Online notify
+          pubsub.publish(`LIKE_ADDED_USER_${post.creator_id}`, { likeAdded: like });
+          //Not online then save in db
+          if(!connectedUsers.has(post.creator_id)){
+            const sender = await User.findByPk(decoded.user_id);
+            const notificationMessage = `${sender?.name} liked your post`;
+            await Notification.create({
+              sender_id: decoded.user_id,
+              receiver_id: post.creator_id,
+              type: NotificationType.LIKE,
+              message: notificationMessage,
+              post_id: post.post_id,
+            })
+            console.log(`Notification stored for offline user: ${post.creator_id}`);
+          }
+        }
         return like;
       } catch (err:any) {
           if(err.name === "SequelizeUniqueConstraintError") throw ConflictError("You have already liked this post");
