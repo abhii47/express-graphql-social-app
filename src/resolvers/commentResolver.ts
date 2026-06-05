@@ -4,9 +4,6 @@ import { authenticate } from "../helpers/auth";
 import { accessForbiddenError, notFoundError, unauthorizedError } from "../helpers/errors";
 import pubsub from "../config/pubsub";
 import { addCommentSchema, updateCommentSchema, validate } from "../helpers/validation";
-import { Notification, User } from "../models";
-import { connectedUsers } from "../app";
-import { NotificationType } from "../models/notification";
 
 const commentResolvers = {
   Query: {},
@@ -23,23 +20,7 @@ const commentResolvers = {
         post_id,
         user_id: decoded.user_id,
       });
-      if(post.creator_id !== decoded.user_id){
-        //Online notify  
-        pubsub.publish(`COMMENT_ADDED_USER_${post.creator_id}`, { commentAdded: comment });
-        //Not online then save in db
-        if(!connectedUsers.has(post.creator_id)){
-            const sender = await User.findByPk(decoded.user_id);
-            const notificationMessage = `${sender?.name} commented on your post.`;
-            await Notification.create({
-              sender_id: decoded.user_id,
-              receiver_id: post.creator_id,
-              type: NotificationType.COMMENT,
-              message: notificationMessage,
-              post_id: post.post_id,
-            });
-            console.log(`Notification stored for offline user: ${post.creator_id}`);
-        }      
-      }
+      pubsub.publish(`COMMENT_ADDED_USER_${post.creator_id}`, { commentAdded: comment });
       return comment;
     },
     updateComment: async (_: any, args: any, { token }: any) => {
