@@ -20,7 +20,6 @@ import {
     createCommentsCountLoader,
     createLikesCountLoader
 } from "./config/dataLoader"
-// import { Notify } from "./helpers/notify";
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -44,11 +43,7 @@ useServer({
             const decoded = authenticate({ token });
             (ctx.extra as any).user = decoded;
             connectedUsers.add(decoded.user_id);
-            // console.log(`inside set =>>`, connectedUsers);
             console.log("Client connected:", decoded.user_id);
-            // const notification = await Notify(decoded.user_id);
-            // const messages = notification.map(n => n.message);
-            // console.log("messages",messages);
             return { user_id: decoded.user_id };
         } catch (err) {
             throw unauthorizedError("Unauthorized: Invalid token");
@@ -71,7 +66,6 @@ useServer({
     onDisconnect: (ctx) => {
         const user = (ctx.extra as any).user;
         connectedUsers.delete(user.user_id);
-        // console.log(`inside set =>>`, connectedUsers);
         console.log("Client disconnected", user.user_id);
     }
 }, wsServer);

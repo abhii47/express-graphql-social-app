@@ -1,4 +1,3 @@
-import { Token } from "graphql";
 import { authenticate } from "../helpers/auth";
 import { Notification } from "../models";
 
