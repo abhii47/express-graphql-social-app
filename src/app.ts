@@ -19,7 +19,10 @@ import {
     createLikesLoader,
     createCommentsCountLoader,
     createLikesCountLoader
-} from "./config/dataLoader"
+} from "./config/dataLoader";
+import { limiter } from "./config/rateLimit";
+import logger from "./config/logger";
+import helmet, { contentSecurityPolicy, crossOriginEmbedderPolicy, crossOriginResourcePolicy } from "helmet";
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -30,22 +33,24 @@ const wsServer = new WebSocketServer({
     server: httpServer,
     path: "/graphql",
 });
-export const connectedUsers = new Set<number>();
+export const connectedUsers = new Set<number>(); //store online users id
 useServer({ 
     schema,
     onConnect: async(ctx) => {
         const token = ctx.connectionParams?.authorization as string;
         console.log("token",token);
         if (!token) {
+            logger.warn("Token required for subscription");
             throw unauthorizedError("Unauthorized: Token required");
         }
         try {
             const decoded = authenticate({ token });
             (ctx.extra as any).user = decoded;
             connectedUsers.add(decoded.user_id);
-            console.log("Client connected:", decoded.user_id);
+            logger.info(`User ${decoded.user_id} connected`);
             return { user_id: decoded.user_id };
         } catch (err) {
+            logger.warn("Invalid token attempt");
             throw unauthorizedError("Unauthorized: Invalid token");
         }
     },
@@ -66,7 +71,7 @@ useServer({
     onDisconnect: (ctx) => {
         const user = (ctx.extra as any).user;
         connectedUsers.delete(user.user_id);
-        console.log("Client disconnected", user.user_id);
+        logger.info(`User ${user.user_id} disconnected`)
     }
 }, wsServer);
 
@@ -80,7 +85,11 @@ const startServer = async() => {
         const port = Number(getEnv("PORT", "4000"));
 
         await server.start();
-        app.use('/graphql',
+        app.use(helmet({
+            crossOriginEmbedderPolicy: false,
+            contentSecurityPolicy: false
+        }));
+        app.use('/graphql', limiter,
             cors({ origin: "*" }),
             express.json(),
             expressMiddleware(server, {
@@ -98,13 +107,13 @@ const startServer = async() => {
         );
         await connectDB();
         await sequelize.sync();
-        console.log("✅ MySQL table created successfully.");
+        logger.info("✅ MySQL table created successfully.");
         httpServer.listen(port, ()=>{
-            console.log(`🚀 Server ready at http://localhost:${port}/graphql`);
-            console.log(`🚀 Subscriptions ready at ws://localhost:${port}/graphql`);
+            logger.info(`🚀 Server ready at http://localhost:${port}/graphql`);
+            logger.info(`🚀 Subscriptions ready at ws://localhost:${port}/graphql`);
         });
     } catch (err:any) {
-        console.log(err);
+        logger.error("Failed to start server:", err);
         process.exit(1);
     }
 }
