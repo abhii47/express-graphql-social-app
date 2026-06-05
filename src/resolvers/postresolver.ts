@@ -1,25 +1,43 @@
 import { Op } from "sequelize";
 import { authenticate } from "../helpers/auth";
 import { accessForbiddenError, notFoundError } from "../helpers/errors";
-import { User, Post, Comment, Like } from "../models";
+import { Post } from "../models";
 import pubsub from "../config/pubsub";
 import { createPostSchema, updatePostSchema, validate } from "../helpers/validation";
 
 const postResolvers = {
   Query: {
-    posts: async (_:any, { limit = 10, offset = 0, creator_id, keyword }:any) => {
+    posts: async (_:any, { limit = 10, cursor, creator_id, keyword }:any) => {
       const where:any = {};
       if(creator_id) where.creator_id = creator_id;
       if(keyword) where.title = { [Op.like]: `%${keyword}%` };
+      if(cursor) where.post_id = { [Op.lt]: cursor };
 
       const posts = await Post.findAll({
         where,
-        limit,
-        offset,
-        order:[["createdAt","DESC"]],
+        limit:limit+1,
+        order:[["post_id","DESC"]],
       });
 
-      return posts;
+      const hasNextPage = posts.length > limit;
+      const edges = 
+          hasNextPage 
+            ? posts.slice(0,limit) 
+            : posts;
+
+      const endCursor = 
+            edges.length > 0 
+              ? edges[edges.length-1].post_id
+              : null;
+
+      return {
+        edges,
+        pageInfo:{
+          hasNextPage,
+          endCursor
+        }
+
+      };
     },
     post: async (_: any, { post_id }: any) => await Post.findByPk(post_id),
   },

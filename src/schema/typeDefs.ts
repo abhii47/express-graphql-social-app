@@ -45,8 +45,18 @@ const typeDefs = `
     user: User!
   }
 
+  type PageInfo {
+    hasNextPage: Boolean!
+    endCursor: ID
+  }
+
+  type PostConnection {
+    edges: [Post!]!
+    pageInfo: PageInfo!
+  }
+
   type Query {
-    posts(limit: Int, offset: Int, creator_id: ID, keyword: String): [Post!]!
+    posts(limit: Int, cursor: ID, creator_id: ID, keyword: String): PostConnection!
     post(post_id: ID!): Post
     notifications: [Notification!]!
   }
