@@ -1,5 +1,5 @@
-import { authenticate } from "../helpers/auth";
-import { Notification } from "../models";
+import { authenticate } from "../../helpers/auth";
+import { Notification } from "../../models";
 
 const notificationResolver = {
     

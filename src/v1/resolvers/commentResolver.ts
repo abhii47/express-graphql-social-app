@@ -1,9 +1,9 @@
-import Comment from "../models/comment";
-import Post from "../models/post";
-import { authenticate } from "../helpers/auth";
-import { accessForbiddenError, notFoundError, unauthorizedError } from "../helpers/errors";
-import pubsub from "../config/pubsub";
-import { addCommentSchema, updateCommentSchema, validate } from "../helpers/validation";
+import Comment from "../../models/comment";
+import Post from "../../models/post";
+import { authenticate } from "../../helpers/auth";
+import { accessForbiddenError, notFoundError, unauthorizedError } from "../../helpers/errors";
+import pubsub from "../../config/pubsub";
+import { addCommentSchema, updateCommentSchema, validate } from "../../helpers/validation";
 
 const commentResolvers = {
   Query: {},

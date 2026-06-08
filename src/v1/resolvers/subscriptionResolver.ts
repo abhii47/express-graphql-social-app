@@ -1,4 +1,4 @@
-import pubsub from "../config/pubsub";
+import pubsub from "../../config/pubsub";
 
 //listen events
 const subscriptionResolver = {

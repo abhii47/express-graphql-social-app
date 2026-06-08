@@ -1,13 +1,13 @@
-import Like from "../models/like";
-import User from "../models/user";
-import Post from "../models/post";
-import { authenticate } from "../helpers/auth";
-import { ConflictError, internalServerError, notFoundError } from "../helpers/errors";
-import pubsub from "../config/pubsub";
-import { likePostSchema, validate } from "../helpers/validation";
-import { connectedUsers } from "../app";
-import { Notification } from "../models";
-import { NotificationType } from "../models/notification";
+import Like from "../../models/like";
+import User from "../../models/user";
+import Post from "../../models/post";
+import { authenticate } from "../../helpers/auth";
+import { ConflictError, internalServerError, notFoundError } from "../../helpers/errors";
+import pubsub from "../../config/pubsub";
+import { likePostSchema, validate } from "../../helpers/validation";
+import { connectedUsers } from "../../app";
+import { Notification } from "../../models";
+import { NotificationType } from "../../models/notification";
 
 const likeResolvers = {
   Query: {},
