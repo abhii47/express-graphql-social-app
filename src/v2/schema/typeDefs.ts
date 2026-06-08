@@ -9,6 +9,7 @@ const typeDefs = `
     post_id: ID!
     title: String!
     content: String!
+    image_url: String
     creator: User!
     likesCount: Int!
     commentsCount: Int!
@@ -64,7 +65,7 @@ const typeDefs = `
   type Mutation {
     register(name: String!, email: String!, password: String!): User!
     login(email: String!, password: String!): AuthPayload!
-    createPost(title: String!, content: String!): Post!
+    createPost(title: String!, content: String!, image_url: String): Post!
     updatePost(post_id: ID!, title: String, content: String): Post!
     deletePost(post_id: ID!): Boolean!
     addComment(post_id: ID!, message: String!): Comment!
