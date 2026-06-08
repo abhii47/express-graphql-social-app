@@ -23,6 +23,17 @@ const typeDefs = `
     post: Post!
   }
 
+  type Notification {
+    notification_id: ID!
+    receiver_id: ID!
+    sender_id: ID!
+    type: String!
+    message: String!
+    is_read: Boolean!
+    post_id: ID!
+    createdAt: String!
+  }
+
   type Like {
     like_id: ID!
     user: User!
@@ -34,9 +45,20 @@ const typeDefs = `
     user: User!
   }
 
+  type PageInfo {
+    hasNextPage: Boolean!
+    endCursor: ID
+  }
+
+  type PostConnection {
+    edges: [Post!]!
+    pageInfo: PageInfo!
+  }
+
   type Query {
-    posts(limit: Int, offset: Int, creator_id: ID, keyword: String): [Post!]!
+    posts(limit: Int, cursor: ID, creator_id: ID, keyword: String): PostConnection!
     post(post_id: ID!): Post
+    notifications: [Notification!]!
   }
 
   type Mutation {
@@ -49,6 +71,7 @@ const typeDefs = `
     updateComment(comment_id: ID!, message: String!): Comment!
     deleteComment(comment_id: ID!): Boolean!
     likePost(post_id: ID!): Like!
+    markNotificationAsRead: Boolean!
   }
   
   type Subscription {
