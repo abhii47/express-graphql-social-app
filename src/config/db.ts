@@ -1,18 +1,19 @@
 import { Sequelize } from "sequelize";
 import { getEnv } from "./env";
+import logger from "./logger";
 
 const sequelize = new Sequelize(getEnv("DB_NAME"), getEnv("DB_USER"), getEnv("DB_PASSWORD"), {
   host: getEnv("DB_HOST", "localhost"),
   dialect: "mysql",
-  logging: console.log,
+  logging: false,
 });
 
 export const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log("✅ MySQL connection established successfully.");
+    logger.info("✅ MySQL connection established successfully.");
   } catch (error) {
-    console.error("❌ Unable to connect to the database:", error);
+    logger.error("❌ Unable to connect to the database:", error);
   }
 };
 

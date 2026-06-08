@@ -10,7 +10,7 @@ import { WebSocketServer } from 'ws';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { useServer } from "graphql-ws/lib/use/ws";
 import { limiter } from "./config/rateLimit";
-import logger from "./config/logger";
+import logger, { httpLogger } from "./config/logger";
 import helmet from "helmet";
 import { createLoaders } from "./helpers/loader";
 import { wsServerConfig } from "./helpers/webConfig";
@@ -49,6 +49,7 @@ const startServer = async() => {
                 limiter,
                 cors({ origin: "*" }),
                 express.json(),
+                httpLogger,
                 expressMiddleware(server, {
                     context: async ({ req }) => ({
                         token: req.headers.authorization,
