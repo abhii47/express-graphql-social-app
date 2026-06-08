@@ -5,8 +5,8 @@ import cors from "cors";
 import sequelize, { connectDB } from "./config/db";
 import http from "http";
 import { getEnv } from "./config/env";
-import typeDefs from "./schema/typeDefs";
-import resolvers from "./resolvers";
+import typeDefs from "./v1/schema/typeDefs";
+import resolvers from "./v1/resolvers";
 import "./models";
 import { WebSocketServer } from 'ws';
 import { makeExecutableSchema } from '@graphql-tools/schema';
@@ -31,7 +31,7 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const wsServer = new WebSocketServer({
     server: httpServer,
-    path: "/graphql",
+    path: "/v1/graphql",
 });
 export const connectedUsers = new Set<number>(); //store online users id
 useServer({ 
@@ -89,7 +89,8 @@ const startServer = async() => {
             crossOriginEmbedderPolicy: false,
             contentSecurityPolicy: false
         }));
-        app.use('/graphql', limiter,
+        app.use('/v1/graphql', 
+            limiter,
             cors({ origin: "*" }),
             express.json(),
             expressMiddleware(server, {
@@ -109,8 +110,8 @@ const startServer = async() => {
         await sequelize.sync();
         logger.info("✅ MySQL table created successfully.");
         httpServer.listen(port, ()=>{
-            logger.info(`🚀 Server ready at http://localhost:${port}/graphql`);
-            logger.info(`🚀 Subscriptions ready at ws://localhost:${port}/graphql`);
+            logger.info(`🚀 Server ready at http://localhost:${port}/v1/graphql`);
+            logger.info(`🚀 Subscriptions ready at ws://localhost:${port}/v1/graphql`);
         });
     } catch (err:any) {
         logger.error("Failed to start server:", err);

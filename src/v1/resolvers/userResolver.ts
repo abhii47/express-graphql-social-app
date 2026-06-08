@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
-import User from "../models/user";
-import { signAuthToken } from "../helpers/auth";
-import { ConflictError, notFoundError, unauthorizedError } from "../helpers/errors";
-import { loginSchema, registerSchema, validate } from "../helpers/validation";
+import User from "../../models/user";
+import { signAuthToken } from "../../helpers/auth";
+import { ConflictError, notFoundError, unauthorizedError } from "../../helpers/errors";
+import { loginSchema, registerSchema, validate } from "../../helpers/validation";
 
 const userResolvers = {
   Query: {},

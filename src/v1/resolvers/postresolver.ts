@@ -1,9 +1,9 @@
 import { Op } from "sequelize";
-import { authenticate } from "../helpers/auth";
-import { accessForbiddenError, notFoundError } from "../helpers/errors";
-import { Post } from "../models";
-import pubsub from "../config/pubsub";
-import { createPostSchema, updatePostSchema, validate } from "../helpers/validation";
+import { authenticate } from "../../helpers/auth";
+import { accessForbiddenError, notFoundError } from "../../helpers/errors";
+import { Post } from "../../models";
+import pubsub from "../../config/pubsub";
+import { createPostSchema, updatePostSchema, validate } from "../../helpers/validation";
 
 const postResolvers = {
   Query: {
