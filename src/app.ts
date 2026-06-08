@@ -16,6 +16,10 @@ import { createLoaders } from "./helpers/loader";
 import { wsServerConfig } from "./helpers/webConfig";
 import * as v1 from "./v1";
 import * as v2 from "./v2";
+import { upload } from "./config/upload";
+import { Request, Response } from "express";
+import cloudinary from "./config/cloudinary";
+import { authMiddleware } from "./helpers/auth";
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -44,6 +48,26 @@ const startServer = async() => {
             crossOriginEmbedderPolicy: false,
             contentSecurityPolicy: false
         }));
+        app.post('/upload', authMiddleware, upload.single("image"), async(req: Request, res: Response) => {
+            if(!req.file) {
+                return res.status(400).json({ error: "No image provided "});
+            }
+            try {
+                const result = await new Promise<any>((resolve, reject) => {
+                    cloudinary.uploader.upload_stream(
+                        {folder:getEnv("CLOUDINARY_FOLDER_NAME")},
+                        (error, result) => {
+                            if(error) return reject(error);
+                            else return resolve(result);
+                        }
+                    ).end(req.file!.buffer);
+                });   
+                return res.json({image_url: result.secure_url});   
+            } catch (err:any) {
+                logger.error("cloudinary uploading failed:", { error:err.message });
+                return res.status(500).json({error: "Internal server error"});
+            }
+        });
         servers.forEach(({ path, server }) => {
             app.use(path, 
                 limiter,
