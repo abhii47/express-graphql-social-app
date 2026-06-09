@@ -44,13 +44,9 @@ const postResolvers = {
     createPost: async (_: any, args: any, { token }: any) => {
       const decoded = authenticate({ token });
       const { title,content } = validate(createPostSchema, args);
-      const { image_url } = args;
       const post = await Post.create({
         title,
         content,
-        image_url: image_url
-          ? image_url
-          : null,
         creator_id: decoded.user_id,
       });
       pubsub.publish("POST_ADDED", { postAdded: post });  

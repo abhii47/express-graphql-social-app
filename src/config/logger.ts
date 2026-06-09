@@ -19,21 +19,8 @@ const logger = winston.createLogger({
         }),
         new winston.transports.File({ 
             filename: "logs/combined.log" 
-        })
+        }),
     ]
 });
-
-export const httpLogger = (req: any, res: any, next: any) => {
-    const start = Date.now();
-    res.on("finish", () => {
-        const duration = Date.now() - start;
-        logger.info(`${req.method} ${req.originalUrl}`, {
-            status: res.statusCode,
-            duration: `${duration}ms`,
-            ip: req.ip,
-        });
-    });
-    next();
-};
 
 export default logger;

@@ -40,15 +40,3 @@ export const signAuthToken = (userId: number) => {
 
   return jwt.sign({ user_id: userId }, getEnv("JWT_SECRET"), { expiresIn });
 };
-
-// ye add karo auth.ts mein
-export const authMiddleware = (req: any, res: any, next: any) => {
-    const token = req.headers.authorization;
-    try {
-        const decoded = authenticate({ token });
-        req.user = decoded;
-        next();
-    } catch (err) {
-        return res.status(401).json({ error: "Unauthorized" });
-    }
-};
