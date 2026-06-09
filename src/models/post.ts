@@ -14,6 +14,7 @@ class Post extends Model<
   declare post_id: CreationOptional<number>;
   declare title: string;
   declare content: string;
+  declare image_url: string | null;
   declare creator_id: number;
 
   declare createdAt: CreationOptional<Date>;
@@ -34,6 +35,10 @@ Post.init(
     content: {
       type: DataTypes.TEXT,
       allowNull: false,
+    },
+    image_url: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     creator_id: {
       type: DataTypes.INTEGER,
