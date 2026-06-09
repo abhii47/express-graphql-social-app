@@ -45,7 +45,7 @@ const postResolvers = {
       const decoded = authenticate({ token });
       const { title,content } = validate(createPostSchema, args);
       const { image_url } = args;
-      const post = await Post.create({
+      const post:number = await Post.create({
         title,
         content,
         image_url: image_url
