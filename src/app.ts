@@ -34,9 +34,9 @@ const versions = [
 const servers = versions.map(({path, typeDefs, resolvers}) => {
     const schema = makeExecutableSchema({ typeDefs, resolvers });
     const server = new ApolloServer({ schema });
-    const wsServer = new WebSocketServer({ server: httpServer, path });
+    const wsServer = new WebSocketServer({ noServer: true });
     useServer(wsServerConfig(schema),wsServer);
-    return { path,server };
+    return { path,server, wsServer };
 });
 
 const startServer = async() => {
@@ -87,6 +87,20 @@ const startServer = async() => {
         await connectDB();
         await sequelize.sync();
         logger.info("✅ MySQL table created successfully.");
+
+        //handle websocket upgrades
+        httpServer.on('upgrade', (request, socket, head) => {
+            const pathname = request.url ? new URL(request.url, `http://${request.headers.host}`).pathname : '';
+            const matchedServer = servers.find(s => s.path === pathname);
+            
+            if (matchedServer) {
+                matchedServer.wsServer.handleUpgrade(request, socket, head, (ws) => {
+                    matchedServer.wsServer.emit('connection', ws, request);
+                });
+            } else {
+                socket.destroy();
+            }
+        });
 
         httpServer.listen(port, ()=>{
             versions.forEach(({ path }) => {
